@@ -103,4 +103,31 @@ function fetchUserData(){
             });
     },1500);
 });
+};
+
+function fetchUserPosts(){
+     return new Promise ((resolve)=>{
+    setTimeout(()=>{
+            resolve({
+                id:162231143419,
+                title: "Zahraa Thompson",
+                content:"????",
+                userid: 12345
+            });
+    },2000);
+});
 }
+
+
+async function getUserInfo() {
+    try{
+        const[user,posts]=await Promise.all([fetchUserData(),fetchUserposts()]);
+
+        console.log("User:",user);
+        console.log("Posts:",posts);
+}catch(error){
+    console.log("Error:" ,error);
+}
+}
+
+getUserInfo();
