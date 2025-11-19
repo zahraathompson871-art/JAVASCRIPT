@@ -92,42 +92,134 @@ fetchingUserPost.then(posts =>{
 // - Combine the data into a single object
 // - Handle any errors that occur in the chain
 
-function fetchUserData(){
-     return new Promise ((resolve)=>{
-    setTimeout(()=>{
-            resolve({
-                id:162231143419,
-                name: "Zahraa Thompson",
-                email:"zahraathompson@gmail.com",
-                registrationDate : "11 October 2078"
-            });
-    },1500);
-});
-};
+    function fetchUserData(){
+        return new Promise ((resolve)=>{
+        setTimeout(()=>{
+                resolve({
+                    id:162231143419,
+                    name: "Zahraa Thompson",
+                    email:"zahraathompson@gmail.com",
+                    registrationDate : "11 October 2078"
+                });
+        },1500);
+    });
+    };
 
-function fetchUserPosts(){
-     return new Promise ((resolve)=>{
-    setTimeout(()=>{
-            resolve({
-                id:162231143419,
-                title: "Zahraa Thompson",
-                content:"????",
-                userid: 12345
-            });
-    },2000);
-});
-}
+    function fetchUserPosts(userId){
+        return new Promise ((resolve)=>{
+        setTimeout(()=>{
+                resolve({
+                    id: userId,
+                    title: "Zahraa Thompson",
+                    content:"????",
+                    userid: 12345
+                });
+        },2000);
+    });
+    }
 
 
-async function getUserInfo() {
-    try{
-        const[user,posts]=await Promise.all([fetchUserData(),fetchUserposts()]);
-
-        console.log("User:",user);
-        console.log("Posts:",posts);
-}catch(error){
-    console.log("Error:" ,error);
-}
+function getUserInfo(){
+    fetchUserData()
+    .then((user)=>{
+        return fetchUserPosts(user.id).then((posts)=>{
+            return{user,posts};
+        });
+    })
+    .then((combinedData)=>{
+        console.log("Combined Data:", combinedData);
+    })
+    .catch((error)=>{
+        console.error("Error:",error);
+    });
 }
 
 getUserInfo();
+
+// TODO: Convert the above Promise chain to use async/await
+// - Use try/catch for error handling
+// - Log each step of the process
+// - Return combined user and posts data
+
+  function fetchUserData(){
+        return new Promise ((resolve)=>{
+        setTimeout(()=>{
+                resolve({
+                    id:162231143419,
+                    name: "Zahraa Thompson",
+                    email:"zahraathompson@gmail.com",
+                    registrationDate : "11 October 2078"
+                });
+        },1500);
+    });
+    };
+
+    function fetchUserPosts(userId){
+        return new Promise ((resolve)=>{
+        setTimeout(()=>{
+                resolve({
+                    id: userId,
+                    title: "Zahraa Thompson",
+                    content:"????",
+                    userid: 12345
+                });
+        },2000);
+    });
+    }
+
+async function getUserInfo() {
+    try{
+        console.log("Getting data...");
+        const user = await fetchUserData();
+        console.log("data received:",user);
+
+        console.log("Getting posts...")
+        const posts = await fetchUserPosts(user.id);
+        console.log("Posts received:", posts );
+
+        const combinedData = {user, posts};
+        console.log("Combined data ready:",combinedData)
+
+        return combinedData;
+
+    }catch(error){
+        console.error("Error occured:", error);
+    }
+}
+
+getUserInfo();
+
+// TODO: Create a function that fetches multiple users in parallel
+// - Take an array of userIds
+// - Fetch all users simultaneously using Promise.all
+// - Handle errors for individual user fetches
+// - Return array of successfully fetched users
+
+async function fetchUserData(userId) {
+    return new Promise((resolve,reject)=>{
+        setTimeout(()=>{
+            if (Math.random()< 0.8){ 
+                resolve ({ id: userId, name: `User ${userId}`});
+            }else{
+                reject(`Error getting user ${userId}`);
+            }
+        }, 1000);
+    });
+}
+
+async function FetchUsersInParallel(userIds) {
+    const UserPromises = userIds.map((userId)=>
+      fetchUserData(userId).catch(error=>{
+        console.error(error);
+        return null;
+      })
+    );
+
+    const users = await Promise.all(userPromises);
+    return users.filter(user => user !== null);
+ }
+
+ const userIds = [1,2,3,4,5];
+ FetchUsersInParallel(userIds).then(users=>{
+    console.log("sucessfully got users:",users)
+ })
