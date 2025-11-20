@@ -195,31 +195,229 @@ getUserInfo();
 // - Handle errors for individual user fetches
 // - Return array of successfully fetched users
 
-async function fetchUserData(userId) {
-    return new Promise((resolve,reject)=>{
+const users = [
+    { id:12345, name: "Zahraa Thompson", email:"zahraathompson@gmail.com",registrationDate : "11 October 2078"},
+    { id:23456, name: "Nina Lewis", email:"ninalewis@gmail.com",registrationDate : "11 October 2078"},
+    { id:34567, name: "Yaseen Esseck", email:"yaseenesseck@gmail.com",registrationDate : "11 October 2078"},
+];
+
+function getUserData(userId){
+    return new Promise((resolve, reject)=>{
         setTimeout(()=>{
-            if (Math.random()< 0.8){ 
-                resolve ({ id: userId, name: `User ${userId}`});
+            const user=users.find(u=>u.id === userId);
+
+            if (user){
+                resolve(user);
             }else{
-                reject(`Error getting user ${userId}`);
+                reject("User not found");
             }
-        }, 1000);
+        },1000);
     });
 }
 
-async function FetchUsersInParallel(userIds) {
-    const UserPromises = userIds.map((userId)=>
-      fetchUserData(userId).catch(error=>{
-        console.error(error);
-        return null;
-      })
-    );
+function fetchMultipleUsers(userIds){
+    return Promise.allSettled(userIds.map(getUserData))
+      .then(results => results
+        .filter(res => res.status === 'fulfilled')
+        .map(res => res.value))
+      .catch(()=>[]);
+}
 
-    const users = await Promise.all(userPromises);
-    return users.filter(user => user !== null);
- }
+fetchMultipleUsers([12345,23456,34567]).then(console.log);
 
- const userIds = [1,2,3,4,5];
- FetchUsersInParallel(userIds).then(users=>{
-    console.log("sucessfully got users:",users)
- })
+// TODO: Create a function that fetches users and their posts in parallel
+// - Fetch user data for multiple users
+// - Once user data is received, fetch all their posts in parallel
+// - Combine user and posts data
+// - Handle errors appropriately
+
+const Users = [
+    { id:12345, name: "Zahraa Thompson", email:"zahraathompson@gmail.com",registrationDate : "11 October 2078"},
+    { id:23456, name: "Nina Lewis", email:"ninalewis@gmail.com",registrationDate : "11 October 2078"},
+    { id:34567, name: "Yaseen Esseck", email:"yaseenesseck@gmail.com",registrationDate : "11 October 2078"},
+];
+
+const Posts = [
+    { postId: 101, userId:12345, content: "Hi", postDate: "12 August 3078"},
+    { postId: 102, userId:23456, content: "Hey", postDate: "28 July 3040"},
+    { postId: 103, userId:34567, content: "Hello", postDate: "1 February 2089"},
+];
+
+async function fetchUsersAndPosts(userIds){
+    try{
+        const users = await fetchUsersAndPosts(userIds);
+    }catch (error){
+        console.error(`failed to fetch posts for user ${Users.id}:`,error);
+        return [];
+    }
+});
+
+function linkPostsToUsers(posts, users){
+    return posts.map(post => {
+        const user = users.find(u => u.id === post.userId);
+        
+        if (user){
+          return {
+            postId: post.postId,
+            content: post.content,
+            postDate: post.postDate,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                registrationDate: user.registrationDate
+            }
+          };
+        }else{
+            return{
+                postId: post.postId,
+                content: post.content,
+                postDate: post.postDate,
+                user: "Unknown user"
+            };
+        }  
+    });
+}
+
+console.log(linkPostsToUsers(Posts, Users));
+
+
+
+
+
+
+
+
+
+
+function getUserData(userId){
+        return new Promise ((resolve, reject)=>{
+        setTimeout(()=>{
+            const success= true;
+            if(success){
+                resolve([{
+                    id: userId,
+                    title: "Zahraa Thompson",
+                    content:"????",
+                    userid: 12345
+                },
+                {   
+                    id: userId,
+                    title: "Nina Lewis",
+                    content:"????",
+                    userid: 23456
+                },
+                {
+                    id: userId,
+                    title: "Yaseen Esseck",
+                    content:"????",
+                    userid: 34567
+                }
+                ]);
+            }else{
+                reject("Failed to get data");
+            }
+
+        },2000);
+    });
+    }
+
+    function fetchMultipleUsers(userIds){
+        const userPromises = userIds.map(userId => getUserData(userId));
+
+        return Promise.allSettled(userPromises)
+        .then(results=>{
+            const successfulResults= results
+            .filter(result=> result.status === 'fulfilled')
+            .map(result => result.value);
+
+            return successfulResults;
+        })
+        .catch(error =>{
+            console.error("Error getting users:",error);
+            return[];
+        });
+    }
+
+    fetchMultipleUsers([12345,23456,34567])
+       .then(sucessfulUsers =>{
+          console.log("Successfully fetched users:", sucessfulUsers);
+       })
+       .catch(error=>{
+        console.error("Error:",error)
+       });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function getUserPosts(){
+    return new Promise ((resolve,reject)=>{
+    setTimeout(()=>{
+        const success= true;
+        if(success){
+            resolve([{
+                id:162231143419,
+                title: "Zahraa Thompson",
+                content:"????",
+                userid: 12345
+            },
+            {
+                id:162239143419,
+                title: "Nina Lewis",
+                content:"????",
+                userid: 2467
+            },
+            {
+                id:162231148419,
+                title: "Yaseen Essack",
+                content:"????",
+                userid: 68252
+            }
+        ]);
+        }else{
+            reject("Failed to fetch data");
+        }
+    },1000);
+});
+}
