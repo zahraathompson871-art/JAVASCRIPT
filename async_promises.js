@@ -243,181 +243,67 @@ const Posts = [
     { postId: 103, userId:34567, content: "Hello", postDate: "1 February 2089"},
 ];
 
-async function fetchUsersAndPosts(userIds){
+async function fetchUsers(userIds) {
+    console.log("Fetching users...");
+
+    await new Promise(resolve => setTimeout(resolve,3000));
+
+    const foundUsers = Users.filter(user=> userIds.includes(user.id));
+
+    if (foundUsers.length === 0){
+        throw new Error("No users found");
+    }
+
+    return foundUsers;
+}
+
+async function fetchUserPosts(userIds) {
+    console.log(`Fetching posts for user ${userIds}...`);
+
+    await new Promise(resolve => setTimeout(resolve,3000));
+
+    const userPosts = Posts.filter(post=> post.userId === userIds);
+
+    return userPosts;
+}
+
+async function fetchUsersandPosts(userIds){
     try{
-        const users = await fetchUsersAndPosts(userIds);
-    }catch (error){
-        console.error(`failed to fetch posts for user ${Users.id}:`,error);
-        return [];
-    }
-});
+        console.log("Fetching user data...");
+        const users = await fetchUsers(userIds);
 
-function linkPostsToUsers(posts, users){
-    return posts.map(post => {
-        const user = users.find(u => u.id === post.userId);
+        console.log("Fetching all posts in parallel...");
+        const postsPromises = users.map(user => fetchUserPosts(user.id));
+        const postsArrays = await Promise.all(postsPromises);
+
+        console.log("Combining user and posts data...");
+        const userWithPosts = users.map((user,index)=> ({
+            ...user,
+            posts: postsArrays[index] || []
+        }));
         
-        if (user){
-          return {
-            postId: post.postId,
-            content: post.content,
-            postDate: post.postDate,
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                registrationDate: user.registrationDate
-            }
-          };
-        }else{
-            return{
-                postId: post.postId,
-                content: post.content,
-                postDate: post.postDate,
-                user: "Unknown user"
-            };
-        }  
-    });
+        return userWithPosts;
+
+    }catch (error) {
+        console.error("Error:", error.message);
+        throw new Error("Failed to fetch users and their posts: " +error.message);
+
+    }
 }
 
-console.log(linkPostsToUsers(Posts, Users));
+async function main() {
+    try{
+        const userIds = [12345, 23456, 34567];
+        console.log("Starting to fetch users and posts...\n");
 
+        const result =  await fetchUsersandPosts(userIds);
 
+        console.log("\nFinal result: ");
+        console.log(JSON.stringify(result, null, 2));
 
-
-
-
-
-
-
-
-function getUserData(userId){
-        return new Promise ((resolve, reject)=>{
-        setTimeout(()=>{
-            const success= true;
-            if(success){
-                resolve([{
-                    id: userId,
-                    title: "Zahraa Thompson",
-                    content:"????",
-                    userid: 12345
-                },
-                {   
-                    id: userId,
-                    title: "Nina Lewis",
-                    content:"????",
-                    userid: 23456
-                },
-                {
-                    id: userId,
-                    title: "Yaseen Esseck",
-                    content:"????",
-                    userid: 34567
-                }
-                ]);
-            }else{
-                reject("Failed to get data");
-            }
-
-        },2000);
-    });
+    }catch (error){
+        console.error("Main function error: ", error.message);
     }
-
-    function fetchMultipleUsers(userIds){
-        const userPromises = userIds.map(userId => getUserData(userId));
-
-        return Promise.allSettled(userPromises)
-        .then(results=>{
-            const successfulResults= results
-            .filter(result=> result.status === 'fulfilled')
-            .map(result => result.value);
-
-            return successfulResults;
-        })
-        .catch(error =>{
-            console.error("Error getting users:",error);
-            return[];
-        });
-    }
-
-    fetchMultipleUsers([12345,23456,34567])
-       .then(sucessfulUsers =>{
-          console.log("Successfully fetched users:", sucessfulUsers);
-       })
-       .catch(error=>{
-        console.error("Error:",error)
-       });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function getUserPosts(){
-    return new Promise ((resolve,reject)=>{
-    setTimeout(()=>{
-        const success= true;
-        if(success){
-            resolve([{
-                id:162231143419,
-                title: "Zahraa Thompson",
-                content:"????",
-                userid: 12345
-            },
-            {
-                id:162239143419,
-                title: "Nina Lewis",
-                content:"????",
-                userid: 2467
-            },
-            {
-                id:162231148419,
-                title: "Yaseen Essack",
-                content:"????",
-                userid: 68252
-            }
-        ]);
-        }else{
-            reject("Failed to fetch data");
-        }
-    },1000);
-});
 }
+
+main();
