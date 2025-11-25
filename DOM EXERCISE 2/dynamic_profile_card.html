@@ -4,15 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Profile Card</title>
+
+    <style>
+        .active-status{
+            background-color: skyblue;
+        }
+    </style>
+
 </head>
-<body>
-    <img src="https://placehold.co/100x100" alt="profileImage" id="profileImage">
-    <h2 id="profileName">John Doe</h2>
-    <p id="profileRole">Software Developer</p>
-    <p id="profileBio">Passionate about coding and learning new technologies</p>
-    <button type="button" id= "updateNameBtn">Update Name</button>
-    <button type="button" id= "updateRoleBtn">Update Role</button>
-    <button type="button" id= "togglestatusBtn">Toggle Active Status</button>
+<body >
+    <div id="profileCard">
+      <img id="profileImage" src="https://i.pinimg.com/736x/b0/8f/81/b08f81636f2e02067c25f57b3ab62850.jpg" alt="profileImage" >
+      <h2 id="profileName">John Doe</h2>
+      <p id="profileRole">Software Developer</p>
+      <p id="profileBio">Passionate about coding and learning new technologies</p>
+      <button type="button" id= "updateNameBtn">Update Name</button>
+      <button type="button" id= "updateRoleBtn">Update Role</button>
+      <button type="button" id= "toggleStatusBtn">Toggle Active Status</button>
+      <button type="button" id= "changeimageBtn">Change Image</button>
+    </div>
 
     <script src="dynamic_profile-card_script.js"></script>
 </body>
