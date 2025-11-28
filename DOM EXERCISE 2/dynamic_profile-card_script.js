@@ -30,7 +30,10 @@ toggleStatusBtn.addEventListener('click',toggleStatus);
 
 function changeImg(){
     let img = prompt("Paste url for image");
+
+    if(img){
     profileImage.src = img;
+    }
 };
 
 changeImageBtn.addEventListener('click',changeImg);
